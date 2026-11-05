@@ -16,8 +16,17 @@ paths:
   /tasks:
     get:
       summary: List all tasks
+      description: Returns all tasks, or only completed / incomplete tasks when the completed query parameter is provided.
       tags:
         - Tasks
+      parameters:
+        - name: completed
+          in: query
+          required: false
+          description: Filter by completion status. true returns only completed tasks, false returns only incomplete tasks. Omit to return all tasks.
+          schema:
+            type: boolean
+          example: true
       responses:
         '200':
           description: OK
@@ -27,6 +36,16 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Task'
+        '400':
+          description: Invalid value for the completed query parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+              example:
+                error: Validation failed
+                details:
+                  - completed must be true or false
     post:
       summary: Create a new task
       tags:
@@ -79,6 +98,16 @@ paths:
                     example: ok
 components:
   schemas:
+    ValidationError:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Validation failed
+        details:
+          type: array
+          items:
+            type: string
     Task:
       type: object
       properties:
